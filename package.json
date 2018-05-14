@@ -1,0 +1,16 @@
+{
+  "name": "Cantina",
+  "version": "1.0.0",
+  "description": "CLI Tool that emulates JQuery's selector on JSON files",
+  "main": "index.js",
+  "scripts": {
+    "start": "node shell",
+    "test": "cross-env NODE_ENV=test mocha test"
+  },
+  "author": "Sam Morrow",
+  "license": "ISC",
+  "dependencies": {
+    "chai": "^4.1.2",
+    "cross-env": "^5.1.5"
+  }
+}
