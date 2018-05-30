@@ -3,12 +3,12 @@ const View = require('./SVC.json')
 if (process.env.NODE_ENV !== 'test') process.stdout.write('Please input a selector below, or type --exit to leave.\n> ')
 
 process.stdin.on('data', rawData => {
-  const sanitizedData = sanitize(rawData);
-  if (sanitizedData === '--exit') process.exit();
-  const commands = parseCmd(sanitizedData)
-  let output = DFSTraverse([View], commands)
-  if (process.env.NODE_ENV === 'test') process.stdout.write(JSON.stringify(output.meta))
-  else process.stdout.write(JSON.stringify(output, null, 1) + "\n\nMetadata:\n" + JSON.stringify(output.meta, null, 1) + '\n\n> ')
+  if (sanitize(rawData) === '--exit') process.exit();
+
+  const commands = parseCmd(sanitize(rawData)),
+    output = DFSTraverse(View, commands)
+  if (process.env.NODE_ENV !== 'test') process.stdout.write(JSON.stringify(output, null, 1) + "\n\nMetadata:\nLength: " + JSON.stringify(output.length, null, 1) + '\n\n> ')
+  else process.stdout.write(JSON.stringify(output.length))
 })
 
 function sanitize(data){
@@ -55,7 +55,7 @@ When a given node matches the final selector in a selection-chain, it is pushed 
 */
 
 function DFSTraverse(tree, commands){
-  let queue = tree, node = {}, selectedNodes = [];
+  let queue = [tree], node = {}, selectedNodes = [];
 
   while (queue.length){
     node = queue.shift();
@@ -65,13 +65,12 @@ function DFSTraverse(tree, commands){
 
     if (isValidMatch(cmd, node)) {
       cmdDepth++;
-      if (cmdDepth >= commands.length) selectedNodes.push(node)
+      if (cmdDepth >= commands.length) selectedNodes = selectedNodes.concat([node])
     }
 
     if (node.contentView) queue = queue.concat(node.contentView.subviews.map(node => Object.assign({}, node, {cmdDepth})))
     if (node.subviews) queue = queue.concat(node.subviews.map(node => Object.assign({}, node, {cmdDepth})))
   }
-  selectedNodes.meta = {"length": selectedNodes.length};  
   return selectedNodes
 }
 
